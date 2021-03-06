@@ -1,17 +1,17 @@
 <template>
-   <!-- lightning button for open modal window -->
+  
    <lightning-button variant="brand"
      label="New Project"
      onclick={openModal}
      class="slds-m-left_x-small"></lightning-button>
-   <!--modal start-->
+   
    <template if:true={isModalOpen}>
-     <!-- modal header starts-->
+     
      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1"
        class="slds-modal slds-fade-in-open">
 
        <div class="slds-modal__container">
-         <!-- Popup header here -->
+        
          <header class="slds-modal__header" style="background-color: #c4e2f7">
            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close"
              onclick={closeModal}>
@@ -25,7 +25,7 @@
              <p style="font-weight: bold">New Project</P>
            </h2>
          </header>
-         <!-- Popup  body starts here -->
+         
          <div
            class="slds-modal__content slds-p-around_medium"
            id="modal-content-id-1">
@@ -77,7 +77,7 @@
            <lightning-input-rich-text value={myVal} formats={formats}>
            </lightning-input-rich-text>
          </div>
-         <!-- Popup footer starts here -->
+         
          <footer class="slds-modal__footer">
            <div class="slds-align_absolute-center">
              <button class="slds-button slds-button_brand" onclick={closeModal} title="Cancel">Cancel
