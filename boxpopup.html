@@ -1,98 +1,114 @@
 <template>
-  
-   <lightning-button variant="brand"
+   
+  <lightning-button variant="brand"
      label="New Project"
      onclick={openModal}
-     class="slds-m-left_x-small"></lightning-button>
-   
-   <template if:true={isModalOpen}>
+     class="slds-m-left_x-small">
+  </lightning-button>
+ 
+  <template if:true={isModalOpen}>
      
-     <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1"
-       class="slds-modal slds-fade-in-open">
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+          <div class="slds-modal__container ">
+             
+              <header class="slds-modal__header" style="background-color:rgb(202, 238, 243);">
+                  <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                      <lightning-icon icon-name="utility:close"
+                          alternative-text="close" variant="inverse" size="small" ></lightning-icon>
+                      <span class="slds-assistive-text">Close</span>
+                  </button>
 
-       <div class="slds-modal__container">
-        
-         <header class="slds-modal__header" style="background-color: #c4e2f7">
-           <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close"
-             onclick={closeModal}>
-
-             <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"
-             ></lightning-icon>
-             <span class="slds-assistive-text">Close</span>
-           </button>
-
-           <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
-             <p style="font-weight: bold">New Project</P>
-           </h2>
-         </header>
-         
-         <div
-           class="slds-modal__content slds-p-around_medium"
-           id="modal-content-id-1">
-
-           <p style="color: #9d9aa1; padding-bottom: 10px"><b>INFORMATION</b></p>
-           <div class="slds-grid slds-gutters">
-             <div class="slds-col">
-               <lightning-input type="text" name="projname" label="Project Name" required value={nameProject}
-                style="padding-bottom: 20px; font-weight: bold">
-               </lightning-input>
-
-               <lightning-input type="text" name="owner" label="Owner" value={ownerName}
-                style="padding-bottom: 20px; font-weight: bold">
-               </lightning-input>
-
-               <lightning-combobox name="status" label="Status" value={statusValues} placeholder="None" options={status.data.values} onchange={handleChangeStatus}
-                 style="padding-bottom: 20px; font-weight: bold" required></lightning-combobox>
-             </div>
-
-             <div class="slds-col">
-               <lightning-combobox name="projectType" label="Project Type" value={projectTypeValues} placeholder="None" options={project.data.values} onchange={handlechangeProject}
-                 style="padding-bottom: 20px; font-weight: bold">
-               </lightning-combobox>
-
-               <lightning-input type="date" name="endDate" label="End Date" placeholder="None"
-                 style="padding-bottom: 20px; font-weight: bold">
-               </lightning-input>
-
-               <lightning-combobox name="priority" label="Priority" value={priorityTypeValues} placeholder="None" options={priority.data.values} onchange={handlechangePriority}
-                 style="padding-bottom: 20px; font-weight: bold">
-                </lightning-combobox>
-             </div>
-           </div>
-
-           
-            <lightning-file-upload
-                label="Upload Files"
-                name="fileUploader"
-                accept={acceptedFormats}
-                record-id={recordId}
-                onuploadfinished={handleUploadFinished}
-                multiple>
-        </lightning-file-upload>
-       
+                  <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" >
+                    <p style="font-weight: bold">New Project</p>
+                  </h2>
+              </header>
+              
+              <lightning-card>
+                  <lightning-record-edit-form object-api-name={objectApiName} fields={fields}
+                  onsuccess={handleSuccess}  onerror={handleError}>
+                    
+                  
+                    
+                      <div class="slds-page-header__row">
+                        <div class="slds-p-left_small">INFORMATION<span></span>
+                      </div>  
+                  </div>
+                      
+                      
+                    <div class="slds-grid slds-gutters">
+                      <div class="slds-col slds-size_1-of-12">
+                        <span></span>
+                      </div>
+                      
+                      <div class="slds-col slds-size_5-of-12">
+                        <span>
+                          <lightning-layout>
+                            <lightning-layout-item style="padding-left: -500px" size="12">
+                              
+                          <lightning-input-field style="font-weight:bold" field-name="Name" required="true"  ></lightning-input-field>
+                          
+                          <lightning-input-field style="font-weight:bold" field-name="Owner__c"> </lightning-input-field>
+                          <lightning-input-field style="font-weight:bold" field-name="Status__c"></lightning-input-field>
+                       
+                   
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12">
+                          <lightning-input-field style="font-weight:bold" field-name="Project_Type__c"></lightning-input-field>
+                          
+                          <lightning-input-field style="font-weight:bold" field-name="End_Date__c"></lightning-input-field>
+                          
+                          <lightning-input-field style="font-weight:bold" field-name="Priority__c"></lightning-input-field>
+                        </lightning-layout-item>
+                          </lightning-layout>
+                         
+                         </span>
+                      </div>
+                     
+                      <div class="slds-col slds-size_1-of-12">
+                        <span></span>
+                      </div>
+                    </div>
 
 
-           <p style="color: #707070; padding-bottom: 10px"><b>DESCRIPTION</b></p>
+                    <div class="slds-p-left_small">
+                    <lightning-file-upload label="Upload File" name="fileUploader" accept={acceptedFormats} record-id={myRecordId}           
+                    onuploadfinished={handleUploadFinished} multiple>
+  </lightning-file-upload>
+</div>
+  <div class="slds-page-header__row">
+    <div class="slds-p-left_small">
+      <div class="slds-p-top_large">DESCRIPTION<span></span>
+    </div>
+    </div>
+    </div>
 
-           <lightning-input-rich-text value={myVal} formats={formats}>
-           </lightning-input-rich-text>
-         </div>
-         
-         <footer class="slds-modal__footer">
-           <div class="slds-align_absolute-center">
-             <button class="slds-button slds-button_brand" onclick={closeModal} title="Cancel">Cancel
-             </button>
+    <div class="slds-p-top_medium">
+  <lightning-input-rich-text formats="font, bold, italic, underline, strike,
+  list, indent, align, link, image, clean, code, code-block, color, background, header">
+      <lightning-rich-text-toolbar-button-group slot="toolbar" aria-label="First group">
+          <lightning-rich-text-toolbar-button
+              icon-name="utility:insert_tag_field"
+              icon-alternative-text="Code Snippet"
+              onclick={handleCodeBlockButtonClick}>
+          </lightning-rich-text-toolbar-button>
+      </lightning-rich-text-toolbar-button-group>
+  </lightning-input-rich-text>
+    </div>
 
-             <button class="slds-button slds-button_brand" onclick={saveRecord} title="Save"> Save
-             </button>
-
-             <button class="slds-button slds-button_brand" onclick={saveandNew} title="Save & New">Save & New
-             </button>
-
-           </div>
-         </footer>
-       </div>
-     </section>
-     <div class="slds-backdrop slds-backdrop_open"></div>
-   </template>
- </template>
+                    <div class="slds-m-top_large slds-grid slds-grid_align-center slds-align–absolute-center">
+                      <lightning-button variant="brand" label="Cancel" type="cancel" onclick={handleCancel}></lightning-button>
+                       &nbsp;&nbsp; 
+                      <lightning-button  type="submit" variant="brand" label="Save"></lightning-button>
+                       &nbsp;&nbsp; 
+                      <lightning-button type="submit" variant="brand" label="Save & New" onclick={saveAndNew}></lightning-button>
+                    </div>
+                    <br/><br/>
+                  </lightning-record-edit-form>
+                </lightning-card>
+              
+          </div>
+      </section>
+      
+      <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+</template>
