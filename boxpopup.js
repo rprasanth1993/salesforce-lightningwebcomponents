@@ -1,132 +1,115 @@
-import { LightningElement, track, wire,api } from "lwc";
-import { getPicklistValues } from 'lightning/uiObjectInfoApi';
+import { LightningElement,track ,api} from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { NavigationMixin } from 'lightning/navigation';
 import PROJECT_OBJECT from '@salesforce/schema/Project__c';
-import STATUS_FIELD from '@salesforce/schema/Project__c.Status__c';
-import PROJECT_TYPE from '@salesforce/schema/Project__c.Project_type__c';
-import PRIORITY_FIELD from '@salesforce/schema/Project__c.Priority__c';
-import saveObj from '@salesforce/apex/popup.popup';
 
-export default class NewProjectPopup extends LightningElement {
-  desc = "";
-  name = "";
-  owner ='';
-    @track statusValues;
-    @track projectTypeValues;
-    @track priorityTypeValues;
 
-  @track isModalOpen = false;
-  openModal() {
-   
-    this.isModalOpen = true;
-  }
-  closeModal() {
+
+export default class boxpopup extends LightningElement {
+    @api
+    myRecordId;
+    redirect = true;
+    resetpage = false;
+    objectApiName = PROJECT_OBJECT;
+    @track isModalOpen = false;
+    openModal() {
+        
+        this.isModalOpen = true;
+    }
+    closeModal() {
+        
+        this.isModalOpen = false;
+    }
+    submitDetails() {
+        
+        this.isModalOpen = false;
+    }
+
     
-    this.isModalOpen = false;
-  }
-  submitDetails() {
-    this.isModalOpen = false;
-  }
+    handleSuccess(event) {
+        const toastEvent = new ShowToastEvent({
+            title: "Project created",
+            message: "Record ID: " + event.detail.id,
+            variant: "success"
+        });
+        this.dispatchEvent(toastEvent);
 
-  @wire(getPicklistValues, {
-    recordTypeId: "012000000000000AAA",
-    fieldApiName: STATUS_FIELD
-  })
-  status;
+        if(this.redirect == true){
+            console.log('handleSuccess'+this.redirect)
+            let creditnoteId = event.detail.id;
+           
+            this[NavigationMixin.Navigate]({
+                type: 'standard__recordPage',
+                attributes: {
+                    recordId:creditnoteId,
+                    objectApiName:'Project__c',
+                    actionName:'view'
+                }
+            })
+        }
+        if(this.resetpage== true){
+            this.handleReset();
+        }
 
-  @wire(getPicklistValues, {
-    recordTypeId: "012000000000000AAA",
-    fieldApiName: PRIORITY_FIELD
-  })
-  priority;
 
-  @wire(getPicklistValues, {
-    recordTypeId: "012000000000000AAA",
-    fieldApiName: PROJECT_TYPE
-  })
-  project;
 
-  formats = [
-    "font",
-    "size",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "indent",
-    "align",
-    "link",
-    "image",
-    "clean",
-    "table",
-    "header",
-    "emoji"
-  ];
-  myval(event) {
-    this.desc = event.target.value;
-  }
-  nameProject(event) {
-    this.name = event.target.value;
-  }
-  handleChange(event) {
-    this.valueStatus = event.detail.value;
-  }
-  ownerName(event) {
-    this.owner = event.target.value;
-  }
+    }
 
-  handleEnddate(event) {
-    this.Enddate = event.target.value;
-  }
+    handleError(event){
+        const evt = new ShowToastEvent({
+            title: 'Error!',
+            message: event.detail.detail,
+            variant: 'error',
+            mode:'dismissable'
+        });
+        this.dispatchEvent(evt);
+    }
+    
+    get acceptedFormats() {
+        return ['.pdf', '.png','.txt'];
+    }
 
-  handleChangeStatus(event) {
-    this.statusValues = event.target.value;
-  }
-  handlechangeProject(event) {
-    this.projectTypeValues = event.target.value;
-  }
-  handlechangePriority(event) {
-    this.priorityTypeValues = event.target.value;
-  }
 
-  @api recordId;
-  get acceptedFormats() {
-      return ['.pdf', '.png','.jpg','.jpeg'];
-  }
-  handleUploadFinished(event) {
-      
-      const uploadedFiles = event.detail.files;
-      let uploadedFileNames = '';
-      for(let i = 0; i < uploadedFiles.length; i++) {
-          uploadedFileNames += uploadedFiles[i].name + ', ';
-      }
-      this.dispatchEvent(
-          new ShowToastEvent({
-              title: 'Success',
-              message: uploadedFiles.length + ' Files uploaded Successfully: ' + uploadedFileNames,
-              variant: 'success',
-          }),
-      );
-  }
+    handleUploadFinished(event) {
+        
+        const uploadedFiles = event.detail.files;
+        alert("No. of files uploaded : " + uploadedFiles.length);
+    }
 
-  saveRecord(){
-    let projectObj = {'sobjectType':'Project__c'};
-    projectObj.Name=this.template.querySelector('lightning-input[name="projname"]').value;
-    projectObj.Owner__c=this.template.querySelector('lightning-input[name="owner"]').value;
-    projectObj.Finish_Date__c=this.template.querySelector('lightning-input[name="endDate"]').value;
-    projectObj.Status__c=this.template.querySelector('lightning-combobox[name="status"]').value;
-    projectObj.Priority__c=this.template.querySelector('lightning-input[name="priority"]').value;
-    projectObj.Project_type__c=this.template.querySelector('lightning-input[name="projectType"]').value;
-    projectObj.Description__c=this.template.querySelector('lightning-input-rich-text').value;
-   
 
-  saveObj({newRecord: projectObj})
-      .then(result => {
-          this.recordId = result;
-      })
-      .catch(error => {
-          this.error = error;
-      });
-      this.submitDetails();
-  }
+    handleCodeBlockButtonClick() {
+        const inputRichText = this.template.querySelector('lightning-input-rich-text');
+        let format = inputRichText.getFormat();
+
+       
+        if (format['code-block']) {
+            inputRichText.setFormat({ 'code-block': false });
+        } else {
+            inputRichText.setFormat({ 'code-block': true });
+        }
+    }
+
+    saveAndNew() {
+        this.redirect = false;
+        this.template.querySelector('lightning-record-edit-form').submit(this.fields);
+        this.resetpage = true;
+    }
+
+    handleReset() {
+        const inputFields = this.template.querySelectorAll(
+            'lightning-input-field'
+        );
+        if (inputFields) {
+            inputFields.forEach(field => {
+                field.reset();
+            });
+        }
+     }
+     handleCancel(event){
+        var url = window.location.href; 
+        var value = url.substr(0,url.lastIndexOf('/') + 1);
+        window.history.back();
+        return false;
+    }
+
 }
